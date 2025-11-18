@@ -1,0 +1,43 @@
+import shortest_path
+import math
+import ground
+import inventory
+import visitor
+
+native_plant = plant
+dry_ground_entities = {Entities.Grass}
+
+def move_to(x,y):
+	start = math.point(get_pos_x(), get_pos_y())
+	goal = math.point(x,y)
+	for dir in shortest_path.find_path(start, goal):
+		move(dir)
+		
+def try_harvest():
+	if can_harvest():
+		return harvest()
+	return False
+
+def wet_soil():
+	while ground.dry_soil()	and inventory.has_water():
+		use_item(Items.Water)
+
+def plant(entity):
+	if not inventory.has_enought_to_produce(entity, 1):
+		quick_print('Not able to plant', entity)
+		return False
+		
+	if ground.need_till():
+		till()
+		
+	if entity not in dry_ground_entities:
+		wet_soil()
+		
+	return native_plant(entity)
+
+def clear():
+	def clear_tile(position):
+		if get_entity_type() not in {Entities.Grass, None}:
+			try_harvest()
+		
+	visitor.spiral(clear_tile)
