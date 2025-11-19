@@ -14,9 +14,14 @@ def move_to(x,y):
 		move(dir)
 		
 def try_harvest():
-	if can_harvest():
-		return harvest()
-	return False
+	if get_entity_type() == None:
+		return False
+		
+	while not can_harvest() and get_entity_type() != Entities.Dead_Pumpkin:
+		pass
+		
+	return harvest()
+
 
 def wet_soil():
 	while ground.dry_soil()	and inventory.has_water():
@@ -37,7 +42,7 @@ def plant(entity):
 
 def clear():
 	def clear_tile(position):
-		if get_entity_type() not in {Entities.Grass, None}:
+		if get_entity_type() not in {None}:
 			try_harvest()
 		
 	visitor.spiral(clear_tile)

@@ -2,6 +2,8 @@
 import farm
 import drone
 import solver
+import calculator
+
 	
 def twice(i):
 	return i < 3
@@ -25,7 +27,10 @@ def can_unlock_expansion(i):
 	return False
 	
 if __name__ == '__main__':
-	solver.solve(Unlocks.Expand)
+	drone.clear()
+	solver.unlock_objective(Unlocks.Grass)
+	#quick_print(calculator.how_many_cicles(Unlocks.Expand))
+	#farm.hay()
 	#farm.wood(twice)
 	#farm.pumpkins(twice)
 	#farm.power(twice)
