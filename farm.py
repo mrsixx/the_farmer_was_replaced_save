@@ -1,4 +1,3 @@
-from drone_visitors import *
 from farm_scenarios import *
 import drone
 import inventory
