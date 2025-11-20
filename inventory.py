@@ -19,3 +19,9 @@ def has_enought_to_unlock(objective):
 			return False
 	return True
 	
+def has_enough_item_for(objective, item):
+	cost = get_cost(objective)
+	if item not in cost:
+		return True
+	return num_items(item) >= cost[item]
+	

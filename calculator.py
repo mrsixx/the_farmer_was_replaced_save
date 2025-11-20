@@ -12,17 +12,28 @@ map_entity = {
 	Items.Hay: Entities.Grass,
 	Items.Pumpkin: Entities.Pumpkin,
 	Items.Wood: Entities.Tree, #tree + bush
-	Items.Carrot: Entities.Carrot
+	Items.Carrot: Entities.Carrot,
+	Items.Power: Entities.Sunflower,
+	Items.Cactus: Entities.Cactus
 }
+
+def lvl(unlock):
+	_lvl = num_unlocked(unlock)
+	return 2**(_lvl-1)
+
+def multiplier(lvl):
+	return 2**(lvl-1)
 
 #lower bounds for an cycle
 def get_harvest_estimate(item):
 	n = get_world_size()
 	harvest_estimate = {
-		Items.Hay: n * 8,
-		Items.Pumpkin: min(6, n) * (n ** 2),
-		Items.Wood: (n**2) * (5 + 2) * 0.5, #tree + bush
-		Items.Carrot: (n**2) * 4
+		Items.Hay: (n**2) * lvl(Unlocks.Grass),
+		Items.Pumpkin: (n**2) * lvl(Unlocks.Pumpkins) * min(6, n),
+		Items.Wood: (n**2) * 3 * lvl(Unlocks.Trees), #n^2 * lvl * (5+1)/2
+		Items.Carrot: (n**2) * lvl(Unlocks.Carrots),
+		Items.Power: (n**2 - 9) * (5 * lvl(Unlocks.Sunflowers)) + 9,
+		Items.Cactus: (n**4) * lvl(Unlocks.Cactus)
 	}
 	return harvest_estimate[item]
 	
@@ -99,4 +110,16 @@ def calc_error():
 	run(Items.Pumpkin, farm.pumpkins)
 
 if __name__ == '__main__':
-	quick_print(how_many_cicles(Unlocks.Pumpkins))
+	quick_print(num_unlocked(Unlocks.Plant))
+	drone.move_to(0,0)
+	drone.try_harvest()
+	drone.plant(Entities.Grass)
+	#drone.clear()
+	#drone.move_to(0,0)
+	#drone.try_harvest()
+	#start = num_items(Items.Pumpkin)
+	#farm.pumpkins()
+	#quick_print('abobora',num_items(Items.Pumpkin)-start)
+	#drone.plant(Entities.Pumpkin)
+	#drone.clear()
+	#quick_print(how_many_cicles(Unlocks.Pumpkins))

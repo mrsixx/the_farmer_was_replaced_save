@@ -4,7 +4,7 @@ import drone
 import inventory
 
 #TODO: calculate topological sort
-topological_sort = [Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin]
+topological_sort = [Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus]
 
 farm_strategies = {
 	Items.Power: farm.power,
@@ -12,6 +12,7 @@ farm_strategies = {
 	Items.Wood: farm.wood,
 	Items.Carrot: farm.carrots,
 	Items.Pumpkin: farm.pumpkins,
+	Items.Cactus: farm.cactus
 }
 
 
@@ -19,13 +20,14 @@ def unlock_objective(objective):
 	quick_print('Starting unlocker...')
 	quick_print('Unlocking ', objective)
 	cycles = calculator.how_many_cicles(objective)
-	cycles[Items.Power] = 2 #TODO: estimate energy
+	cycles[Items.Power] = 1 #TODO: estimate energy
 	quick_print('Scheduling: ', cycles)
 	for dependency in topological_sort:
 		if dependency not in cycles:
 			continue
-		if inventory.has_enought_to_unlock(objective):
-			break
+		if inventory.has_enough_item_for(objective, dependency):
+			quick_print('Stopping farm', dependency, '...')
+			continue
 				
 		farm_strategy = farm_strategies[dependency]
 		for i in range(cycles[dependency]):

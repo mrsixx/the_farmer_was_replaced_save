@@ -1,34 +1,19 @@
-
 import farm
 import drone
 import solver
 import calculator
 
-	
-def twice(i):
-	return i < 3
-
-def grass_above_10k(i):
-	return num_items(Items.Hay) < 10000
-
-def wood_above_10k(i):
-	return num_items(Items.Wood) < 10000
-
-def carrots_above_10k(i):
-	return num_items(Items.Carrot) < 10000
-
-def can_unlock_expansion(i):
-	cost = get_cost(Unlocks.Expand)
-	for item in cost:
-		if  num_items(item) < cost[item]:
-			return True
-	
-	unlock(Unlocks.Expand)			
-	return False
-	
 if __name__ == '__main__':
 	drone.clear()
-	solver.unlock_objective(Unlocks.Grass)
+#	farm.power()
+	while True:
+		farm.power()
+		farm.cactus()
+	#while True:
+		#for u in [Unlocks.Pumpkins]:
+			#drone.clear()
+			#solver.unlock_objective(u)
+	
 	#quick_print(calculator.how_many_cicles(Unlocks.Expand))
 	#farm.hay()
 	#farm.wood(twice)

@@ -2,11 +2,14 @@ import drone
 import inventory
 import visitor
 import structures
+import algorithms
 
 def hay():
+	clear()
 	def sow_field(position):
+		
 		drone.try_harvest()
-		drone.plant(Entities.Grass)
+		#drone.plant(Entities.Grass)
 		
 	change_hat(Hats.Straw_Hat)
 	visitor.zig_zag_columns(sow_field)
@@ -15,7 +18,8 @@ def hay():
 def wood():
 	def plant_a_lot_of_wood(position):
 		drone.try_harvest()
-		choice = [Entities.Bush, Entities.Tree][position['Rank'] % 2]
+		wich = position['X'] % 2 == position['Y'] % 2
+		choice = [Entities.Bush, Entities.Tree][wich]
 		drone.plant(choice)
 	
 	change_hat(Hats.Tree_Hat)
@@ -90,3 +94,18 @@ def power():
 		for x,y in sunflowers[petals]:
 			drone.move_to(x,y)
 			drone.try_harvest()
+
+def cactus():
+	n = get_world_size()
+	def making_a_desert(position):
+		x,y = position['X'], position['Y']
+		drone.plant(Entities.Cactus)
+	
+	change_hat(Hats.Cactus_Hat)
+	visitor.zig_zag_rows(making_a_desert)
+	for i in range(n):
+		algorithms.bubble_sort_row(i)
+	
+	for i in range(n):
+		algorithms.bubble_sort_col(i)
+	drone.clear()

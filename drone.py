@@ -16,10 +16,13 @@ def move_to(x,y):
 def try_harvest():
 	if get_entity_type() == None:
 		return False
-		
+	
+	fertilized = False
 	while not can_harvest() and get_entity_type() != Entities.Dead_Pumpkin:
-		pass
-		
+		use_item(Items.Fertilizer)
+		fertilized = True
+	if fertilized:
+		use_item(Items.Weird_Substance)
 	return harvest()
 
 
