@@ -3,11 +3,11 @@ import inventory
 import visitor
 import structures
 import algorithms
+import polyculture
 
 def hay():
 	clear()
 	def sow_field(position):
-		
 		drone.try_harvest()
 		#drone.plant(Entities.Grass)
 		
@@ -15,29 +15,57 @@ def hay():
 	visitor.zig_zag_columns(sow_field)
 	drone.clear()
 
-def wood():
+def wood(enable_polyculture=True):
+	votes = polyculture.get_polyculture_map(enable_polyculture)
+
 	def plant_a_lot_of_wood(position):
 		drone.try_harvest()
-		wich = position['X'] % 2 == position['Y'] % 2
+		x,y = position['X'],position['Y']
+		wich = x % 2 == y % 2
 		choice = [Entities.Bush, Entities.Tree][wich]
-		drone.plant(choice)
+		final_choice = choice
+
+		if enable_polyculture:
+			final_choice = polyculture.get_most_voted(votes, (x,y))
+
+		drone.plant(final_choice)
+		
+		if enable_polyculture and final_choice != choice:
+			type, tile = get_companion()
+			polyculture.vote(votes, tile, type)
 	
 	change_hat(Hats.Tree_Hat)
 	visitor.zig_zag_columns(plant_a_lot_of_wood)
+	if enable_polyculture:
+		drone.clear_only({Entities.Bush, Entities.Tree})
 	drone.clear()
 	
-def carrots():
+def carrots(enable_polyculture=True):
+	votes = polyculture.get_polyculture_map(enable_polyculture)
 	n = get_world_size()
 	if	not inventory.has_enought_to_produce(Entities.Carrot, (n**2)):
 		quick_print('Canot produce carrots')
 		return None
 		
 	def whats_up_doc(position):
+		x,y = position['X'],position['Y']
 		drone.try_harvest()
-		drone.plant(Entities.Carrot)
+		plant = None
+		if enable_polyculture:
+			plant = polyculture.get_most_voted(votes, (x,y))
+		if not plant:
+			plant = Entities.Carrot
+
+		drone.plant(plant)
+
+		if enable_polyculture and plant == Entities.Carrot:
+			type, tile = get_companion()
+			polyculture.vote(votes, tile, type)
 		
 	change_hat(Hats.Wizard_Hat)
 	visitor.zig_zag_rows(whats_up_doc)
+	if enable_polyculture:
+		drone.clear_only({ Entities.Carrot })
 	drone.clear()
 	
 def pumpkins():

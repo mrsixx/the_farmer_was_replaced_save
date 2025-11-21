@@ -49,3 +49,10 @@ def clear():
 			try_harvest()
 		
 	visitor.spiral(clear_tile)
+
+def clear_only(types):
+	def clear_tile(position):
+		if get_entity_type() in types:
+			try_harvest()
+		
+	visitor.spiral(clear_tile)
