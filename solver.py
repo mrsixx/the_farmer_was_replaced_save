@@ -70,31 +70,3 @@ def unlock_objective(objective):
 		do_a_flip()
 	else:
 		quick_print('failed to unlock ', objective)
-
-	
-def unlock_objective_old(objective):
-	quick_print('Starting unlocker...')
-	quick_print('Unlocking ', objective)
-	cycles = calculator.how_many_cicles(objective)
-	cycles[Items.Power] = 1 #TODO: estimate energy
-	quick_print('Scheduling: ', cycles)
-	for dependency in topological_sort:
-		if dependency not in cycles:
-			continue
-		if inventory.has_enough_item_for(objective, dependency):
-			quick_print('Stopping farm', dependency, '...')
-			continue
-				
-		farm_strategy = farm_strategies[dependency]
-		for i in range(cycles[dependency]):
-			if inventory.has_enought_to_unlock(objective):
-				break
-				
-			quick_print('Farming ', dependency, ' (',i+1,'/',cycles[dependency],')')
-			drone.move_to(0,0)
-			farm_strategy()
-	quick_print('Stopping unlocker...')
-	unlock(objective)
-	quick_print(objective, ' unlocked!')
-	do_a_flip()
-	
