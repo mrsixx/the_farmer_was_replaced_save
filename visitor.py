@@ -23,13 +23,15 @@ def zig_zag_columns(activity):
 def chunks(activity):
 	size = get_world_size()
 	chunk_size = size // 4
-	for ii in range(0, size, chunk_size):
-		xq = ii // chunk_size
-		for jj in range(0, size, chunk_size):
-			yq = jj // chunk_size
+	for jj in range(0, size, chunk_size):
+		yq = jj // chunk_size
+		
+		for ii in range(0, size, chunk_size):
+			xq = ii // chunk_size
 			for i in range(ii, ii + chunk_size, 1):
 				for j in range(jj, jj + chunk_size, 1):
-					drone.move_to(i,j)
+					j2 = (1 - (i%2)) * j + (i%2)* (2* jj + chunk_size - j - 1)
+					drone.move_to(i,j2)
 					activity(parameter_factory(i, j, chunk_size, xq, yq))
 
 def spiral(activity):
@@ -65,3 +67,6 @@ def spiral(activity):
 				drone.move_to(r, left)
 				activity(parameter_factory(r, left, size, 0, 0))
 			left += 1
+
+if __name__ == '__main__':
+	pass
