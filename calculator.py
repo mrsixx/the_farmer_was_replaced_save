@@ -17,6 +17,15 @@ map_entity = {
 	Items.Cactus: Entities.Cactus
 }
 
+# heuristic values (average)
+power_consume_cycle = {
+	Items.Hay: 50,
+	Items.Pumpkin: 100,
+	Items.Wood: 100, #tree + bush
+	Items.Carrot: 70,
+	Items.Cactus: 400
+}
+
 def lvl(unlock):
 	_lvl = num_unlocked(unlock)
 	return 2**(_lvl-1)
@@ -59,7 +68,10 @@ def calculate_cost_recursive(desired_item, amount):
 		for dependency in dependencies_cost:
 			__key_accumulate(obj, dependency, dependencies_cost[dependency])
 	return obj
-	
+
+def production_cycles(item, amount):
+	estimate = get_harvest_estimate(item)
+	return math.round_positive(amount / estimate)
 
 def how_many_cicles(objective):
 	cycles = {}

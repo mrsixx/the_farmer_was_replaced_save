@@ -23,14 +23,17 @@ def wood(enable_polyculture=True):
 		x,y = position['X'],position['Y']
 		wich = x % 2 == y % 2
 		choice = [Entities.Bush, Entities.Tree][wich]
-		final_choice = choice
+		final_choice = None
 
 		if enable_polyculture:
 			final_choice = polyculture.get_most_voted(votes, (x,y))
-
+		
+		if not final_choice:
+			final_choice = choice
+		
 		drone.plant(final_choice)
 		
-		if enable_polyculture and final_choice != choice:
+		if enable_polyculture and final_choice == choice:
 			type, tile = get_companion()
 			polyculture.vote(votes, tile, type)
 	

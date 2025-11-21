@@ -2,6 +2,7 @@ def has_enought_to_produce(item, amount):
 	cost = get_cost(item)
 	for key in cost:
 		if num_items(key) < amount * cost[key]:
+			quick_print(key, num_items(key), amount * cost[key])
 			return False
 	return True
 	
