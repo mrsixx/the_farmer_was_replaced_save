@@ -140,3 +140,16 @@ def cactus():
 	for i in range(n):
 		algorithms.bubble_sort_col(i)
 	drone.clear()
+
+def gold():
+	n = get_world_size()
+	drone.move_to(0,0)
+	maze.create(n)
+	def treasure_found(x,y):
+		return get_entity_type() == Entities.Treasure
+	algorithms.depht_first_search(treasure_found)
+	drone.try_harvest()
+
+if __name__ == '__main__':
+	#hay()
+	pumpkins()

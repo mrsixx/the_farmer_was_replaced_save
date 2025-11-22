@@ -1,4 +1,4 @@
-import shortest_path
+import algorithms
 import math
 import ground
 import inventory
@@ -10,7 +10,7 @@ dry_ground_entities = {Entities.Grass}
 def move_to(x,y):
 	start = math.point(get_pos_x(), get_pos_y())
 	goal = math.point(x,y)
-	for dir in shortest_path.find_path(start, goal):
+	for dir in algorithms.find_path(start, goal):
 		move(dir)
 		
 def try_harvest():

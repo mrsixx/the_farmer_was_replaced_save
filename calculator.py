@@ -4,23 +4,24 @@ import math
 
 # heuristic values (average)
 power_consume_cycle = {
-	Items.Hay: 50,
-	Items.Pumpkin: 100,
-	Items.Wood: 100, #tree + bush
+	Items.Hay: 40,
+	Items.Pumpkin: 90,
+	Items.Wood: 90, #tree + bush
 	Items.Carrot: 70,
-	Items.Cactus: 400
+	Items.Cactus: 330
 }
 
-#heuristic factor of polyculture gains
+#heuristic factor of production factors
 def get_harvest_factor(item):
-	polyculture_factor = {
-		Items.Hay: 2, #TODO: still without polyculture
-		Items.Wood: 3.5,
-		Items.Carrot: 4,
+	factor = {
+		Items.Hay: 2, #harvesting 2x in farm.hay
+		Items.Wood: 3.5, #polyculture
+		Items.Carrot: 4, #polyculture
+		Items.Power: 0.95 #sunflower cycle consumes 5% of expected
 	}
-	if item not in polyculture_factor:
+	if item not in factor:
 		return 1
-	return polyculture_factor[item]
+	return factor[item]
 
 def mult(unlock):
 	return 2**(num_unlocked(unlock)-1)
@@ -34,7 +35,8 @@ def get_harvest_estimate(item):
 		Items.Wood: (n**2) * 3 * mult(Unlocks.Trees), #n^2 * mult * (5+1)/2
 		Items.Carrot: (n**2) * mult(Unlocks.Carrots),
 		Items.Power: (n**2 - 9) * (5 * mult(Unlocks.Sunflowers)) + 9,
-		Items.Cactus: (n**4) * mult(Unlocks.Cactus)
+		Items.Cactus: (n**4) * mult(Unlocks.Cactus),
+		Items.Gold: (n**2) * mult(Unlocks.Mazes)
 	}
 	return harvest_estimate[item]
 
@@ -63,4 +65,6 @@ def calculate_yield(entity, farmer_action):
 
 
 if __name__ == '__main__':
-	quick_print(calculate_yield(Items.Carrot, farm.carrots))
+	quick_print(calculate_yield(Items.Gold, farm.gold))
+	
+	#quick_print(calculate_yield(Items.Power, farm.cactus))
