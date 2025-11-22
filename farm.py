@@ -4,7 +4,33 @@ import visitor
 import structures
 import algorithms
 import polyculture
+import maze
 
+def hay_parallel(enable_polyculture=True):
+	votes = polyculture.get_polyculture_map(enable_polyculture)
+	n = get_world_size()
+		
+	def whats_up_doc(position):
+		x,y = position['coord']
+		drone.try_harvest()
+		plant = None
+		if enable_polyculture:
+			plant = polyculture.get_most_voted(votes, (x,y))
+		if not plant:
+			plant = Entities.Carrot
+
+		drone.plant(plant)
+
+		if enable_polyculture and plant == Entities.Carrot:
+			type, tile = get_companion()
+			polyculture.vote(votes, tile, type)
+		
+	change_hat(Hats.Wizard_Hat)
+	visitor.parallel_chunks(whats_up_doc)
+	if enable_polyculture:
+		drone.clear_only({ Entities.Carrot })
+	drone.clear()
+	
 def hay():
 	clear()
 	def sow_field(position):
@@ -12,7 +38,7 @@ def hay():
 		#drone.plant(Entities.Grass)
 		
 	change_hat(Hats.Straw_Hat)
-	visitor.zig_zag_columns(sow_field)
+	visitor.parallel_chunks(sow_field)
 	drone.clear()
 
 def wood(enable_polyculture=True):
@@ -20,7 +46,7 @@ def wood(enable_polyculture=True):
 
 	def plant_a_lot_of_wood(position):
 		drone.try_harvest()
-		x,y = position['X'],position['Y']
+		x,y = position['coord']
 		wich = x % 2 == y % 2
 		choice = [Entities.Bush, Entities.Tree][wich]
 		final_choice = None
@@ -51,7 +77,7 @@ def carrots(enable_polyculture=True):
 		return None
 		
 	def whats_up_doc(position):
-		x,y = position['X'],position['Y']
+		x,y = position['coord']
 		drone.try_harvest()
 		plant = None
 		if enable_polyculture:
@@ -76,35 +102,32 @@ def pumpkins():
 	if	not inventory.has_enought_to_produce(Entities.Pumpkin, 1.5 * (n**2)):
 		quick_print('Canot produce pumpkins')
 		return None
-		
-	fila = structures.queue()
-	def smashing_pumpkins(position):
-		def check_queue(dont_stop=False):
-			if fila['size']() > num_items(Items.Carrot):
-				return None
-			while fila['is_not_empty']():
+	def scope():
+		fila = structures.queue()
+		def check_queue():
+			while not fila['empty']():
 				cur = fila['dequeue']()
-				drone.move_to(cur['X'], cur['Y'])
-				is_dead = get_entity_type() == Entities.Dead_Pumpkin
+				x,y = cur['coord']
+				drone.move_to(x, y)
 				if not can_harvest():
 					fila['enqueue'](cur)
-					if not is_dead and not dont_stop:
-						break
-				if is_dead:
-					drone.plant(Entities.Pumpkin)
-							
-		last_tile = position['Rank'] == get_world_size() ** 2
-		if drone.plant(Entities.Pumpkin):
-			fila['enqueue'](position)
-		
-		if fila['size']() > (position['Chunk']['Size'] ** 2) - 1 or last_tile:
-			check_queue(last_tile)
+					
+					is_dead = get_entity_type() == Entities.Dead_Pumpkin
+					if is_dead:
+						drone.plant(Entities.Pumpkin)
+						
+		def smashing_pumpkins(position):
+			if drone.plant(Entities.Pumpkin):
+				fila['enqueue'](position)
 			
+			last_tile = fila['size']() == position['chunk']['tiles']
+			if last_tile:
+				check_queue()
+		return smashing_pumpkins
 		
 	change_hat(Hats.Traffic_Cone)
-	visitor.chunks(smashing_pumpkins)
+	visitor.parallel_chunks(scope(), 4)
 	drone.clear()
-
 
 def power():
 	size = get_world_size()
@@ -114,7 +137,7 @@ def power():
 		sunflowers[i] = set()
 
 	def planting_sunflowers(position):
-		x,y = position['X'], position['Y']
+		x,y = position['coord']
 		drone.plant(Entities.Sunflower)
 		petals = measure()
 		if petals != None:
@@ -129,7 +152,7 @@ def power():
 def cactus():
 	n = get_world_size()
 	def making_a_desert(position):
-		x,y = position['X'], position['Y']
+		x,y = position['coord']
 		drone.plant(Entities.Cactus)
 	
 	change_hat(Hats.Cactus_Hat)

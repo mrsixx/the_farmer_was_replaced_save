@@ -4,7 +4,7 @@ import drone
 import inventory
 
 #TODO: calculate topological sort
-topological_sort = [Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus]
+topological_sort = [ Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus, Items.Gold ]
 
 farm_strategies = {
 	Items.Power: farm.power,
@@ -12,7 +12,8 @@ farm_strategies = {
 	Items.Wood: farm.wood,
 	Items.Carrot: farm.carrots,
 	Items.Pumpkin: farm.pumpkins,
-	Items.Cactus: farm.cactus
+	Items.Cactus: farm.cactus,
+	Items.Gold: farm.gold
 }
 
 map_entity = {
@@ -21,12 +22,13 @@ map_entity = {
 	Items.Wood: Entities.Tree, #tree + bush
 	Items.Carrot: Entities.Carrot,
 	Items.Power: Entities.Sunflower,
-	Items.Cactus: Entities.Cactus
+	Items.Cactus: Entities.Cactus,
+	Items.Gold: Entities.Treasure
 }
 
 def __farm_power_to(item, cycles):
 	power_needed = calculator.power_consume_cycle[item] * cycles
-	__farm_item_recursive(Items.Power, power_needed)
+	__farm_item_recursive(Items.Power, 1.05 * power_needed) #5% of power will be consumed farming power
 
 
 def __farm_item_recursive(item, amount):
@@ -42,7 +44,7 @@ def __farm_item_recursive(item, amount):
 	cycles = calculator.production_cycles(item, amount_needed)
 	if item != Items.Power:
 		quick_print('Farming power for ', item, ' x', cycles, ' if needed...')
-		__farm_power_to(item, cycles)
+		#__farm_power_to(item, cycles)
 
 	quick_print('farming ', item, ' x', cycles, '(', amount_needed, ' un. )')
 	for i in range(cycles):
