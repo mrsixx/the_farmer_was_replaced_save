@@ -171,14 +171,33 @@ def cactus():
 
 def gold():
 	n = get_world_size()
-	drone.move_to(0,0)
+	n_2 = n // 2
+	drone.move_to(n_2,n_2)
+	drone.plant(Entities.Bush)
 	maze.create(n)
+	gold_position = measure()
+
+	def distance(dir):
+		global gold_position
+		dx,dy = drone.vector[dir]
+		x,y = get_pos_x() + dx, get_pos_y() + dy
+		ax, ay = gold_position
+		
+		dist = ((ax-x) ** 2 + (ay - y) ** 2) ** 0.5 + random()
+		return dist
 	def treasure_found(x,y):
 		return get_entity_type() == Entities.Treasure
-	algorithms.depht_first_search(treasure_found)
+		
+	for _ in range(301):
+		algorithms.depht_first_search(treasure_found, distance)
+		maze.create(n, False)		
+		gold_position = measure()
+		
 	drone.try_harvest()
 
 def bones():
+	n = get_world_size()
+	tiles = n ** 2
 	_apples = 0
 	change_hat(Hats.Carrot_Hat)
 	change_hat(Hats.Dinosaur_Hat)
@@ -191,7 +210,7 @@ def bones():
 		x,y = get_pos_x() + dx, get_pos_y() + dy
 		ax, ay = apple_position
 		#dist = abs(ax-x) + abs(ay - y)
-		dist = ((ax-x) ** 2 + (ay - y) ** 2) ** 0.5
+		dist = ((ax-x) ** 2 + (ay - y) ** 2) ** 0.5 + random()
 		return dist
 
 	def eat_apple(position):
@@ -202,7 +221,7 @@ def bones():
 			apple_position = measure()
 			_apples += 1
 			
-		if _apples > 10:
+		if _apples >= tiles:
 			change_hat(Hats.Brown_Hat)
 			_apples = 0
 			change_hat(Hats.Dinosaur_Hat)
@@ -211,6 +230,7 @@ def bones():
 
 if __name__ == '__main__':
 	#change_hat(Hats.Brown_Hat)
-	clear()
-	bones()
+	#quick_print(random())
+	#clear()
+	gold()
 	#wood()

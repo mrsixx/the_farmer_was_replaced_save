@@ -4,7 +4,7 @@ import drone
 import inventory
 
 #TODO: calculate topological sort
-topological_sort = [ Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus, Items.Gold ]
+topological_sort = [ Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus, Items.Gold, Items.Bone ]
 
 farm_strategies = {
 	Items.Power: farm.power,
@@ -13,7 +13,8 @@ farm_strategies = {
 	Items.Carrot: farm.carrots,
 	Items.Pumpkin: farm.pumpkins,
 	Items.Cactus: farm.cactus,
-	Items.Gold: farm.gold
+	Items.Gold: farm.gold,
+	Items.Bone: farm.bones
 }
 
 map_entity = {
@@ -23,7 +24,8 @@ map_entity = {
 	Items.Carrot: Entities.Carrot,
 	Items.Power: Entities.Sunflower,
 	Items.Cactus: Entities.Cactus,
-	Items.Gold: Entities.Treasure
+	Items.Gold: Entities.Treasure,
+	Items.Bone: Entities.Apple
 }
 
 def __farm_power_to(item, cycles):

@@ -72,7 +72,7 @@ def find_path(start, goal):
 	return path
 				
 
-def depht_first_search(target_achieved):
+def depht_first_search(target_achieved, heuristic):
 	visited = set()
 	achieved = False
 	
@@ -85,13 +85,12 @@ def depht_first_search(target_achieved):
 		if target_achieved(x,y):
 			achieved = True
 			return
-			
-		for dir in [West,North, East, South]:
-			if move(dir):
-				nx, ny = get_pos_x(), get_pos_y()
-				if (nx,ny) in visited:
-					move(oposite[dir])
-					continue
+		directions = insertion_sort([West,North, East, South], heuristic)
+		for dir in directions:
+			dx, dy = drone.vector[dir]
+			nx, ny = x+dx, y+dy
+			if can_move(dir) and (nx, ny) not in visited:
+				move(dir)
 				dfs(nx,ny)
 				if achieved:
 					return
