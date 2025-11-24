@@ -178,6 +178,39 @@ def gold():
 	algorithms.depht_first_search(treasure_found)
 	drone.try_harvest()
 
+def bones():
+	_apples = 0
+	change_hat(Hats.Carrot_Hat)
+	change_hat(Hats.Dinosaur_Hat)
+	
+	apple_position = measure()
+	
+	def distance(dir):
+		global apple_position
+		dx,dy = drone.vector[dir]
+		x,y = get_pos_x() + dx, get_pos_y() + dy
+		ax, ay = apple_position
+		#dist = abs(ax-x) + abs(ay - y)
+		dist = ((ax-x) ** 2 + (ay - y) ** 2) ** 0.5
+		return dist
+
+	def eat_apple(position):
+		global _apples
+		global apple_position
+		
+		if get_entity_type() == Entities.Apple:
+			apple_position = measure()
+			_apples += 1
+			
+		if _apples > 10:
+			change_hat(Hats.Brown_Hat)
+			_apples = 0
+			change_hat(Hats.Dinosaur_Hat)
+
+	visitor.snake(eat_apple,distance)
+
 if __name__ == '__main__':
-	#hay()
-	wood()
+	#change_hat(Hats.Brown_Hat)
+	clear()
+	bones()
+	#wood()

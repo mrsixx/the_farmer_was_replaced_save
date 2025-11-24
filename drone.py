@@ -7,6 +7,13 @@ import visitor
 native_plant = plant
 dry_ground_entities = {Entities.Grass}
 
+vector = {
+	North: (0,1),
+	East: (1,0),
+	South: (0,-1),
+	West: (-1,0),
+}
+
 def move_to(x,y):
 	start = math.point(get_pos_x(), get_pos_y())
 	goal = math.point(x,y)

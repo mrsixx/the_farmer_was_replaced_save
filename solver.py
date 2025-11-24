@@ -38,6 +38,7 @@ def __farm_item_recursive(item, amount):
 	entity = map_entity[item]
 	production_cost = get_cost(entity)
 	for dependency in production_cost:
+		quick_print(amount_needed, item, 'costs ', amount_needed * production_cost[dependency], dependency, '...')
 		__farm_item_recursive(dependency, amount_needed * production_cost[dependency])
 
 	farm_strategy = farm_strategies[item]

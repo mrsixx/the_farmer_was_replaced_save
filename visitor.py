@@ -1,5 +1,6 @@
 import drone
 import math
+import algorithms
 
 def parameter_factory(x, y, chunk_size=None, xq=0, yq=0):
 	n = get_world_size()
@@ -35,16 +36,18 @@ def zig_zag_rows(activity):
 def parallel_rows(activity, num_workers=8):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
-	rows_per_worker = size // num_workers
+	rows_per_worker = math.round_positive(size / num_workers)
 	
 	def work_factory(start):
 		def work():
-			for j in range(start, start+rows_per_worker, 1):
+			for j in range(start, min(size, start+rows_per_worker), 1):
 				for i in range(size):
 					i2 = (1 - (j%2)) * i + (j%2) * (size-1-i)
 					drone.move_to(i2,j)
 					activity(parameter_factory(i2, j)) 
+					
 		return work
+		
 	drones = []
 	for j in range(rows_per_worker, size, rows_per_worker):
 		drones.append(spawn_drone(work_factory(j)))
@@ -55,16 +58,18 @@ def parallel_rows(activity, num_workers=8):
 def parallel_cols(activity, num_workers=8):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
-	cols_per_worker = size // num_workers
+	cols_per_worker = math.round_positive(size / num_workers)
 	
 	def work_factory(start):
 		def work():
-			for i in range(start, start+cols_per_worker, 1):
+			for i in range(start, min(size, start+cols_per_worker), 1):
 				for j in range(size):
 					j2 = (1 - (i%2)) * j + (i%2)* (size-1-j)
 					drone.move_to(i,j2)
-					activity(parameter_factory(i, j2)) 
+					activity(parameter_factory(i, j2))
+
 		return work
+		
 	drones = []
 	for i in range(cols_per_worker, size, cols_per_worker):
 		d = spawn_drone(work_factory(i))
@@ -82,7 +87,7 @@ def zig_zag_columns(activity):
 			drone.move_to(i,j2)
 			activity(parameter_factory(i, j2))
 
-def chunks(activity):
+def chunks(activity): # broken
 	size = get_world_size()
 	cz = size // 4
 	for jj in range(0, size, cz):
@@ -98,10 +103,9 @@ def chunks(activity):
 					
 def parallel_chunks(activity, num_workers=4):
 	size = get_world_size()
-	if num_workers > max_drones():
-		quick_print('Sorry, we canot create', num_workers, 'drones')
-		return
+	num_workers = min(num_workers, max_drones())
 	tiles_per_worker = (size ** 2) // num_workers
+	
 	cz_h = math.sqrt(tiles_per_worker)
 	if cz_h % 1 == 0: # perfect square
 		cz_w = cz_h
@@ -167,36 +171,53 @@ def spiral(activity):
 				activity(parameter_factory(r, left))
 			left += 1
 			
-def snake(activity):
+def _get_moves(x,y):
 	n = get_world_size()
-	while True:
-		x,y = get_pos_x(), get_pos_y()
-		even_row = y % 2 == 0
-		first_row, first_col = y == 0, x == 0
-		last_row, last_col = y == n - 2, x == n - 2
-	 
-		if even_row:
-			if first_col:
-				move(North)
-			elif not first_row and last_col:
-				move(South)
-			else:
-				move(West)
-		else:
-			if last_col:
-				move(South)
-			elif not last_row and first_col:
-				move(North)
-			else:
-				move(East)
-		activity(None)
+	even_col, even_row = x % 2 == 0, y % 2 == 0
+	first_row, first_col = y == 0, x == 0
+	last_row, last_col = y == n - 1, x == n - 1
 	
+	if even_col and even_row:
+		return [South, East]
+	elif not even_col and even_row:
+		return [North, East]
+	elif even_col and not even_row:
+		return [West, South]
+	else:
+		return [West, North]
+		
+		
+def snake(activity, heuristic):
+	while True: 
+		x,y = get_pos_x(), get_pos_y()
+		moves = algorithms.insertion_sort(_get_moves(x,y), heuristic)
+		
+		moved = False
+		for dir in moves:
+			if not can_move(dir):
+				continue
+			moved = True
+			dx, dy = drone.vector[dir]
+			move(dir)
+			activity(parameter_factory(x+dx, y+dy))
+			break
+			
+		if not moved:
+			quick_print('unable to move')
+			break
 	
 if __name__ == '__main__':
+	change_hat(Hats.Carrot_Hat)
 	clear()
 	drone.move_to(0,0)
+	change_hat(Hats.Dinosaur_Hat)
+	for dir in [North, East, South, West]:
+		quick_print(dir, can_move(dir))
+	
+	algorithms.insertion_sort(_get_moves(1,3), heuristic)
 	def action(pos):
 		till()
+	#snake(action)
 	#for i in [8,16]:
-	snake(action)
+	#snake(action)
 	pass

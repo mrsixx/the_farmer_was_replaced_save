@@ -3,6 +3,19 @@ import structures
 
 oposite = { North: South, South: North, East: West, West: East }
 
+def identity(x):
+	return x
+	
+def insertion_sort(list, criteria=identity):
+	for i in range(1, len(list)):
+		j = i - 1
+		v = list[i]
+		while j >= 0 and criteria(v) < criteria(list[j]):
+			list[j+1], list[j] = list[j], list[j+1] 
+			j -= 1
+	return list
+
+
 def bubble_sort_row(row):
 	n = get_world_size()
 	for i in range(n):
@@ -85,3 +98,4 @@ def depht_first_search(target_achieved):
 				move(oposite[dir])
 				
 	dfs(get_pos_x(), get_pos_y())
+
