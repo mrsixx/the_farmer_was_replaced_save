@@ -32,6 +32,48 @@ def zig_zag_rows(activity):
 			drone.move_to(i2,j)
 			activity(parameter_factory(i2, j))
 
+def parallel_rows(activity, num_workers=8):
+	size = get_world_size()
+	num_workers = min(num_workers, max_drones())
+	rows_per_worker = size // num_workers
+	
+	def work_factory(start):
+		def work():
+			for j in range(start, start+rows_per_worker, 1):
+				for i in range(size):
+					i2 = (1 - (j%2)) * i + (j%2) * (size-1-i)
+					drone.move_to(i2,j)
+					activity(parameter_factory(i2, j)) 
+		return work
+	drones = []
+	for j in range(rows_per_worker, size, rows_per_worker):
+		drones.append(spawn_drone(work_factory(j)))
+	work_factory(0)()
+	for d in drones:
+		wait_for(d)
+
+def parallel_cols(activity, num_workers=8):
+	size = get_world_size()
+	num_workers = min(num_workers, max_drones())
+	cols_per_worker = size // num_workers
+	
+	def work_factory(start):
+		def work():
+			for i in range(start, start+cols_per_worker, 1):
+				for j in range(size):
+					j2 = (1 - (i%2)) * j + (i%2)* (size-1-j)
+					drone.move_to(i,j2)
+					activity(parameter_factory(i, j2)) 
+		return work
+	drones = []
+	for i in range(cols_per_worker, size, cols_per_worker):
+		d = spawn_drone(work_factory(i))
+		if d:
+			drones.append(d)
+	work_factory(0)()
+	for d in drones:
+		wait_for(d)
+
 def zig_zag_columns(activity):
 	size = get_world_size()
 	for i in range(size):
@@ -83,7 +125,6 @@ def parallel_chunks(activity, num_workers=4):
 				continue
 			
 			while True:
-				quick_print('to', xq, yq)
 				d = spawn_drone(work)
 				if d:
 					drones.append(d)
@@ -125,12 +166,37 @@ def spiral(activity):
 				drone.move_to(r, left)
 				activity(parameter_factory(r, left))
 			left += 1
-
+			
+def snake(activity):
+	n = get_world_size()
+	while True:
+		x,y = get_pos_x(), get_pos_y()
+		even_row = y % 2 == 0
+		first_row, first_col = y == 0, x == 0
+		last_row, last_col = y == n - 2, x == n - 2
+	 
+		if even_row:
+			if first_col:
+				move(North)
+			elif not first_row and last_col:
+				move(South)
+			else:
+				move(West)
+		else:
+			if last_col:
+				move(South)
+			elif not last_row and first_col:
+				move(North)
+			else:
+				move(East)
+		activity(None)
+	
+	
 if __name__ == '__main__':
 	clear()
 	drone.move_to(0,0)
 	def action(pos):
 		till()
-	for i in [8,6]:
-		parallel_chunks(action, i)
+	#for i in [8,16]:
+	snake(action)
 	pass

@@ -14,7 +14,7 @@ power_consume_cycle = {
 #heuristic factor of production factors
 def get_harvest_factor(item):
 	factor = {
-		Items.Hay: 2, #harvesting 2x in farm.hay
+		Items.Hay: 2.6, #harvesting 2x in farm.hay
 		Items.Wood: 3.5, #polyculture
 		Items.Carrot: 4, #polyculture
 		Items.Power: 0.95 #sunflower cycle consumes 5% of expected
@@ -65,6 +65,7 @@ def calculate_yield(entity, farmer_action):
 
 
 if __name__ == '__main__':
-	quick_print(calculate_yield(Items.Gold, farm.gold))
+
+	quick_print(calculate_yield(Items.Carrot, farm.carrots))
 	
-	#quick_print(calculate_yield(Items.Power, farm.cactus))
+	#quick_print(calculate_yield(Items.Carrot, farm.carrots))

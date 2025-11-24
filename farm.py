@@ -6,7 +6,7 @@ import algorithms
 import polyculture
 import maze
 
-def hay_parallel(enable_polyculture=True):
+def hay(enable_polyculture=True):
 	votes = polyculture.get_polyculture_map(enable_polyculture)
 	n = get_world_size()
 		
@@ -17,28 +17,28 @@ def hay_parallel(enable_polyculture=True):
 		if enable_polyculture:
 			plant = polyculture.get_most_voted(votes, (x,y))
 		if not plant:
-			plant = Entities.Carrot
+			plant = Entities.Grass
 
 		drone.plant(plant)
 
-		if enable_polyculture and plant == Entities.Carrot:
+		if enable_polyculture and plant == Entities.Grass:
 			type, tile = get_companion()
 			polyculture.vote(votes, tile, type)
 		
-	change_hat(Hats.Wizard_Hat)
-	visitor.parallel_chunks(whats_up_doc)
+	change_hat(Hats.Straw_Hat)
+	visitor.parallel_cols(whats_up_doc)
 	if enable_polyculture:
-		drone.clear_only({ Entities.Carrot })
+		drone.clear_only({ Entities.Grass })
 	drone.clear()
 	
-def hay():
+def hay_sequencial():
 	clear()
 	def sow_field(position):
 		drone.try_harvest()
 		#drone.plant(Entities.Grass)
 		
 	change_hat(Hats.Straw_Hat)
-	visitor.parallel_chunks(sow_field)
+	visitor.parallel_rows(sow_field)
 	drone.clear()
 
 def wood(enable_polyculture=True):
@@ -64,7 +64,7 @@ def wood(enable_polyculture=True):
 			polyculture.vote(votes, tile, type)
 	
 	change_hat(Hats.Tree_Hat)
-	visitor.zig_zag_columns(plant_a_lot_of_wood)
+	visitor.parallel_cols(plant_a_lot_of_wood)
 	if enable_polyculture:
 		drone.clear_only({Entities.Bush, Entities.Tree})
 	drone.clear()
@@ -92,7 +92,7 @@ def carrots(enable_polyculture=True):
 			polyculture.vote(votes, tile, type)
 		
 	change_hat(Hats.Wizard_Hat)
-	visitor.zig_zag_rows(whats_up_doc)
+	visitor.parallel_rows(whats_up_doc)
 	if enable_polyculture:
 		drone.clear_only({ Entities.Carrot })
 	drone.clear()
@@ -151,17 +151,22 @@ def power():
 
 def cactus():
 	n = get_world_size()
-	def making_a_desert(position):
+	def make_a_desert(position):
 		x,y = position['coord']
 		drone.plant(Entities.Cactus)
-	
+		
+	def sort_row(position):
+		x,y = position['coord']
+		algorithms.bubble_sort_row(y)
+		
+	def sort_col(position):
+		x,y = position['coord']
+		algorithms.bubble_sort_col(x)
+		
 	change_hat(Hats.Cactus_Hat)
-	visitor.zig_zag_rows(making_a_desert)
-	for i in range(n):
-		algorithms.bubble_sort_row(i)
-	
-	for i in range(n):
-		algorithms.bubble_sort_col(i)
+	visitor.parallel_rows(make_a_desert)
+	visitor.parallel_rows(sort_row)
+	visitor.parallel_cols(sort_col)
 	drone.clear()
 
 def gold():
@@ -175,4 +180,4 @@ def gold():
 
 if __name__ == '__main__':
 	#hay()
-	pumpkins()
+	wood()

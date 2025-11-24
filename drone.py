@@ -48,11 +48,11 @@ def clear():
 		if get_entity_type() not in {None}:
 			try_harvest()
 		
-	visitor.spiral(clear_tile)
+	visitor.parallel_cols(clear_tile)
 
 def clear_only(types):
 	def clear_tile(position):
 		if get_entity_type() in types:
 			try_harvest()
 		
-	visitor.spiral(clear_tile)
+	visitor.parallel_rows(clear_tile)
