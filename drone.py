@@ -62,5 +62,6 @@ def clear_only(types):
 	def clear_tile(position):
 		if get_entity_type() in types:
 			try_harvest()
+		return None
 		
 	visitor.parallel_rows(clear_tile, max_drones())

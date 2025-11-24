@@ -131,16 +131,18 @@ def cactus():
 		
 	def sort_row(position):
 		x,y = position['coord']
-		algorithms.bubble_sort_row(y)
+		algorithms.insertion_sort_cactus(x,y)
+		return None
 		
 	def sort_col(position):
 		x,y = position['coord']
-		algorithms.bubble_sort_col(x)
+		algorithms.insertion_sort_cactus(x, y, 'col')
+		return None
 		
 	change_hat(Hats.Cactus_Hat)
 	visitor.parallel_rows(make_a_desert, max_drones())
-	visitor.parallel_rows(sort_row, max_drones())
-	visitor.parallel_cols(sort_col, max_drones())
+	visitor.parallel_rows(sort_row, max_drones(), False)
+	visitor.parallel_cols(sort_col, max_drones(), False)
 	drone.clear()
 
 def gold():
@@ -206,5 +208,6 @@ if __name__ == '__main__':
 	#change_hat(Hats.Brown_Hat)
 	#quick_print(random())
 	#clear()
-	hay()
+	#clear()
+	cactus()
 	#wood()

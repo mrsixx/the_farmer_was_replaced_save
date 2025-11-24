@@ -8,7 +8,9 @@ power_consume_cycle = {
 	Items.Pumpkin: 90,
 	Items.Wood: 90, #tree + bush
 	Items.Carrot: 70,
-	Items.Cactus: 330
+	Items.Cactus: 330,
+	Items.Gold: 5000,
+	Items.Bone: 5000
 }
 
 #heuristic factor of production factors
@@ -25,7 +27,21 @@ def get_harvest_factor(item):
 
 def mult(unlock):
 	return 2**(num_unlocked(unlock)-1)
-
+	
+def get_cost_per_cycle(item):
+	n = get_world_size()
+	cost = {
+		Items.Hay: (n**2),
+		Items.Pumpkin: 2 * (n**2),
+		Items.Wood: (n**2),
+		Items.Carrot: (n**2),
+		Items.Power: (n**2),
+		Items.Cactus: (n**2),
+		Items.Gold: 300,
+		Items.Bone: 1 #TODO: estimate
+	}
+	return cost[item]
+	
 #lower bounds for an cycle
 def get_harvest_estimate(item):
 	n = get_world_size()

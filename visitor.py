@@ -33,7 +33,7 @@ def zig_zag_rows(activity):
 			drone.move_to(i2,j)
 			activity(parameter_factory(i2, j))
 
-def parallel_rows(activity, num_workers=8):
+def parallel_rows(activity, num_workers=8,zig_zag=True):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
 	rows_per_worker = math.round_positive(size / num_workers)
@@ -43,9 +43,11 @@ def parallel_rows(activity, num_workers=8):
 			result = {}
 			for j in range(start, min(size, start+rows_per_worker), 1):
 				for i in range(size):
-					i2 = (1 - (j%2)) * i + (j%2) * (size-1-i)
-					drone.move_to(i2,j)
-					result[(i2,j)] = activity(parameter_factory(i2, j)) 
+					ni = i
+					if zig_zag:
+						ni = (1 - (j%2)) * i + (j%2) * (size-1-i)
+					drone.move_to(ni,j)
+					result[(ni,j)] = activity(parameter_factory(ni, j)) 
 			return result
 		return work
 		
@@ -57,7 +59,7 @@ def parallel_rows(activity, num_workers=8):
 		results.append(wait_for(d))
 	return results
 
-def parallel_cols(activity, num_workers=8):
+def parallel_cols(activity, num_workers=8,zig_zag=True):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
 	cols_per_worker = math.round_positive(size / num_workers)
@@ -67,9 +69,11 @@ def parallel_cols(activity, num_workers=8):
 			result = {}
 			for i in range(start, min(size, start+cols_per_worker), 1):
 				for j in range(size):
-					j2 = (1 - (i%2)) * j + (i%2)* (size-1-j)
-					drone.move_to(i,j2)
-					result[(i,j2)] = activity(parameter_factory(i, j2))
+					nj = j
+					if zig_zag:
+						nj = (1 - (i%2)) * j + (i%2)* (size-1-j)
+					drone.move_to(i,nj)
+					result[(i,nj)] = activity(parameter_factory(i, nj))
 			return result
 		return work
 		

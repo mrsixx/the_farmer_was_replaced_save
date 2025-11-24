@@ -2,6 +2,7 @@ import calculator
 import farm
 import drone
 import inventory
+import math
 
 #TODO: calculate topological sort
 topological_sort = [ Items.Power, Items.Hay, Items.Wood, Items.Carrot, Items.Pumpkin, Items.Cactus, Items.Gold, Items.Bone ]
@@ -38,16 +39,21 @@ def __farm_item_recursive(item, amount):
 	if amount_needed == 0:
 		return
 	entity = map_entity[item]
+	cycles = calculator.production_cycles(item, amount_needed)
+	entities_per_cycle = calculator.get_cost_per_cycle(item)
+	demand = cycles * entities_per_cycle
 	production_cost = get_cost(entity)
+	
 	for dependency in production_cost:
-		quick_print(amount_needed, item, 'costs ', amount_needed * production_cost[dependency], dependency, '...')
-		__farm_item_recursive(dependency, amount_needed * production_cost[dependency])
+		quick_print(amount_needed, item, 'costs ', demand * production_cost[dependency], dependency, '...')
+		__farm_item_recursive(dependency, demand * production_cost[dependency])
+		quick_print('farmed', demand * production_cost[dependency], dependency, '...')
 
 	farm_strategy = farm_strategies[item]
-	cycles = calculator.production_cycles(item, amount_needed)
+	
 	if item != Items.Power:
 		quick_print('Farming power for ', item, ' x', cycles, ' if needed...')
-		#__farm_power_to(item, cycles)
+		__farm_power_to(item, cycles)
 
 	quick_print('farming ', item, ' x', cycles, '(', amount_needed, ' un. )')
 	for i in range(cycles):

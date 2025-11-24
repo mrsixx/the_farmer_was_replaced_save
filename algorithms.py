@@ -43,6 +43,34 @@ def bubble_sort_col(col):
 				swapped = True
 		if not swapped:
 			break
+def insertion_sort_cactus(x,y,type='row'):
+	def insertion_sort_row(x,y):
+		j = x - 1
+		v = measure()
+		while j >= 0:
+			drone.move_to(j, y)
+			if v >= measure():
+				break
+			drone.move_to(j+1, y)
+			swap(West)
+			j -= 1
+	
+	def insertion_sort_col(x,y):
+		j = y - 1
+		v = measure()
+		while j >= 0:
+			drone.move_to(x, j)
+			if v >= measure():
+				break
+			drone.move_to(x, j+1)
+			swap(South)
+			j -= 1
+	if type == 'col' and x != 0:
+		insertion_sort_col(x,y)
+	elif type == 'row' and y != 0:
+		insertion_sort_row(x,y)
+	else:
+		pass
 
 def find_path(start, goal):
 	n = get_world_size()
