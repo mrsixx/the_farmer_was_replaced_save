@@ -54,12 +54,13 @@ def clear():
 	def clear_tile(position):
 		if get_entity_type() not in {None}:
 			try_harvest()
+		return None
 		
-	visitor.parallel_cols(clear_tile)
+	visitor.parallel_cols(clear_tile, max_drones())
 
 def clear_only(types):
 	def clear_tile(position):
 		if get_entity_type() in types:
 			try_harvest()
 		
-	visitor.parallel_rows(clear_tile)
+	visitor.parallel_rows(clear_tile, max_drones())

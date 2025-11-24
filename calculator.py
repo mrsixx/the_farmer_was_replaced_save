@@ -14,9 +14,9 @@ power_consume_cycle = {
 #heuristic factor of production factors
 def get_harvest_factor(item):
 	factor = {
-		Items.Hay: 43.5, #harvesting 2x in farm.hay
-		Items.Wood: 49.5, #polyculture
-		Items.Carrot: 39, #polyculture
+		Items.Hay: 79.5, #harvesting 2x in farm.hay
+		Items.Wood: 89.5, #polyculture
+		Items.Carrot: 78.5, #polyculture
 		Items.Power: 0.95 #sunflower cycle consumes 5% of expected
 	}
 	if item not in factor:
@@ -55,18 +55,26 @@ def calculate_inventory_variation_after(item, action):
 
 def calculate_yield(entity, farmer_action):
 	expected = get_harvest_estimate(entity)
+	start_time = get_time()
 	obtained = calculate_inventory_variation_after(entity, farmer_action)
+	finish_time = get_time()
 	return {
 		'entity': entity,
 		'expected': expected,
 		'obtained': obtained,
 		'percentual_variation': ((obtained-expected) / expected) * 100,
 		'percent_of_target': (obtained / expected) * 100,
+		'duration': finish_time - start_time
 	}
 
 
 if __name__ == '__main__':
 
+	quick_print(calculate_yield(Items.Hay, farm.hay))
 	quick_print(calculate_yield(Items.Wood, farm.wood))
-	
-	#quick_print(calculate_yield(Items.Carrot, farm.carrots))
+	quick_print(calculate_yield(Items.Carrot, farm.carrots))
+	#quick_print(calculate_yield(Items.Pumpkin, farm.pumpkins))
+	#quick_print(calculate_yield(Items.Power, farm.power))
+	#quick_print(calculate_yield(Items.Cactus, farm.cactus))
+	#quick_print(calculate_yield(Items.Gold, farm.gold))
+	#quick_print(calculate_yield(Items.Bone, farm.bone))

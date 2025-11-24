@@ -37,37 +37,40 @@ def parallel_rows(activity, num_workers=8):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
 	rows_per_worker = math.round_positive(size / num_workers)
-	
+	results = []
 	def work_factory(start):
 		def work():
+			result = {}
 			for j in range(start, min(size, start+rows_per_worker), 1):
 				for i in range(size):
 					i2 = (1 - (j%2)) * i + (j%2) * (size-1-i)
 					drone.move_to(i2,j)
-					activity(parameter_factory(i2, j)) 
-					
+					result[(i2,j)] = activity(parameter_factory(i2, j)) 
+			return result
 		return work
 		
 	drones = []
 	for j in range(rows_per_worker, size, rows_per_worker):
 		drones.append(spawn_drone(work_factory(j)))
-	work_factory(0)()
+	results.append(work_factory(0)())
 	for d in drones:
-		wait_for(d)
+		results.append(wait_for(d))
+	return results
 
 def parallel_cols(activity, num_workers=8):
 	size = get_world_size()
 	num_workers = min(num_workers, max_drones())
 	cols_per_worker = math.round_positive(size / num_workers)
-	
+	results = []
 	def work_factory(start):
 		def work():
+			result = {}
 			for i in range(start, min(size, start+cols_per_worker), 1):
 				for j in range(size):
 					j2 = (1 - (i%2)) * j + (i%2)* (size-1-j)
 					drone.move_to(i,j2)
-					activity(parameter_factory(i, j2))
-
+					result[(i,j2)] = activity(parameter_factory(i, j2))
+			return result
 		return work
 		
 	drones = []
@@ -75,9 +78,10 @@ def parallel_cols(activity, num_workers=8):
 		d = spawn_drone(work_factory(i))
 		if d:
 			drones.append(d)
-	work_factory(0)()
+	results.append(work_factory(0)())
 	for d in drones:
-		wait_for(d)
+		results.append(wait_for(d))
+	return results
 
 def zig_zag_columns(activity):
 	size = get_world_size()
@@ -110,9 +114,9 @@ def parallel_chunks(activity, num_workers=4):
 	if cz_h % 1 == 0: # perfect square
 		cz_w = cz_h
 	else:
-		cz_h, cz_w = size // num_workers, size
+		cz_h, cz_w = size // min(size, num_workers), size
 		
-	chunk_size = size // num_workers
+	chunk_size = size // min(size, num_workers)
 
 	drones = []
 	for jj in range(0, size, cz_h):
